@@ -1,0 +1,69 @@
+# Dependencies
+node_modules/
+
+# Environment variables
+.env
+.env.*
+!.env.example
+!.env.sample
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage / test output
+coverage/
+.nyc_output/
+
+# Build outputs
+build/
+dist/
+out/
+
+# Cache
+.cache/
+.tmp/
+tmp/
+.eslintcache
+.stylelintcache
+*.tsbuildinfo
+
+# Package manager artifacts
+.pnpm-store/
+.yarn/cache/
+.yarn/unplugged/
+.yarn/build-state.yml
+.yarn/install-state.gz
+.yarn/*.log
+.pnp.*
+
+# Optional: local DB / Supabase artifacts (if any)
+# supabase/.temp/
+
+# IDEs / editors
+.vscode/
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/launch.json
+!.vscode/tasks.json
+.idea/
+*.iml
+
+# OS files (Windows/macOS)
+.DS_Store
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Node (optional)
+.node_repl_history
