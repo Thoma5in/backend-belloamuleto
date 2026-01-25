@@ -58,6 +58,7 @@ tmp/
 !.vscode/tasks.json
 .idea/
 *.iml
+.md
 
 # OS files (Windows/macOS)
 .DS_Store
