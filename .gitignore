@@ -1,9 +1,10 @@
 # Dependencies
 node_modules/
 
-# Environment variables
+# Environment variables - NUNCA commitear archivos con secretos
 .env
 .env.*
+*.env
 !.env.example
 !.env.sample
 
@@ -58,7 +59,10 @@ tmp/
 !.vscode/tasks.json
 .idea/
 *.iml
-.md
+
+# Documentación local - Archivos Markdown (no commitear)
+*.md
+!README.md
 
 # OS files (Windows/macOS)
 .DS_Store
