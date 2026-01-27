@@ -46,11 +46,10 @@ export class ProductController {
       const filters = {
         page: parseInt(req.query.page) || 1,
         limit: parseInt(req.query.limit) || 10,
-        category: req.query.category,
+        idCategoria: req.query.idCategoria ? parseInt(req.query.idCategoria) : undefined,
         minPrice: req.query.minPrice ? parseFloat(req.query.minPrice) : undefined,
         maxPrice: req.query.maxPrice ? parseFloat(req.query.maxPrice) : undefined,
-        isActive: req.query.isActive !== undefined ? req.query.isActive === 'true' : true,
-        sortBy: req.query.sortBy || 'created_at',
+        sortBy: req.query.sortBy || 'id',
         sortOrder: req.query.sortOrder || 'desc'
       };
 
@@ -97,7 +96,7 @@ export class ProductController {
   async createProduct(req, res, next) {
     try {
       // Validación básica de entrada
-      const requiredFields = ['name', 'price'];
+      const requiredFields = ['nombre', 'precio'];
       const missingFields = requiredFields.filter(field => !req.body[field]);
       
       if (missingFields.length > 0) {
@@ -107,12 +106,11 @@ export class ProductController {
       }
 
       const productData = {
-        name: req.body.name,
-        description: req.body.description,
-        price: req.body.price,
+        nombre: req.body.nombre,
+        descripcion: req.body.descripcion,
+        precio: req.body.precio,
         stock: req.body.stock,
-        category: req.body.category,
-        is_active: req.body.is_active
+        id_categoria: req.body.id_categoria ? parseInt(req.body.id_categoria) : undefined
       };
 
       const product = await this.service.createProduct(productData);
@@ -203,9 +201,9 @@ export class ProductController {
    */
   async getProductsByCategory(req, res, next) {
     try {
-      const { category } = req.params;
+      const { idCategoria } = req.params;
 
-      const products = await this.service.getProductsByCategory(category);
+      const products = await this.service.getProductsByCategory(parseInt(idCategoria));
 
       res.status(200).json({
         success: true,

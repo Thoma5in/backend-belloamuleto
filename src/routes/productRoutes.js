@@ -24,11 +24,10 @@ const router = Router();
  * @access  Public
  * @query   {number} page - Número de página (default: 1)
  * @query   {number} limit - Límite de items por página (default: 10)
- * @query   {string} category - Filtrar por categoría
+ * @query   {number} idCategoria - Filtrar por categoría (ID numérico)
  * @query   {number} minPrice - Precio mínimo
  * @query   {number} maxPrice - Precio máximo
- * @query   {boolean} isActive - Filtrar por productos activos
- * @query   {string} sortBy - Campo para ordenar (default: created_at)
+ * @query   {string} sortBy - Campo para ordenar (default: id)
  * @query   {string} sortOrder - Orden: asc o desc (default: desc)
  */
 router.get('/', productController.getAllProducts);
@@ -50,12 +49,12 @@ router.get('/low-stock', productController.getLowStockProducts);
 router.get('/search', productController.searchProducts);
 
 /**
- * @route   GET /api/products/category/:category
+ * @route   GET /api/products/category/:idCategoria
  * @desc    Obtener productos por categoría
  * @access  Public
- * @param   {string} category - Nombre de la categoría
+ * @param   {number} idCategoria - ID de la categoría
  */
-router.get('/category/:category', productController.getProductsByCategory);
+router.get('/category/:idCategoria', productController.getProductsByCategory);
 
 /**
  * @route   GET /api/products/:id
@@ -70,12 +69,11 @@ router.get('/:id', productController.getProductById);
  * @desc    Crear un nuevo producto
  * @access  Private (aquí podrías agregar middleware de autenticación)
  * @body    {object} product - Datos del producto
- * @body    {string} product.name - Nombre del producto (requerido)
- * @body    {string} product.description - Descripción
- * @body    {number} product.price - Precio (requerido)
+ * @body    {string} product.nombre - Nombre del producto (requerido)
+ * @body    {string} product.descripcion - Descripción
+ * @body    {number} product.precio - Precio (requerido)
  * @body    {number} product.stock - Stock inicial
- * @body    {string} product.category - Categoría
- * @body    {boolean} product.is_active - Estado activo
+ * @body    {number} product.id_categoria - ID de categoría (FK)
  */
 router.post('/', productController.createProduct);
 
