@@ -40,7 +40,7 @@ export class BaseRepository {
    */
   async findAll(options = {}) {
     try {
-      const { filters = {}, orderBy = 'created_at', ascending = false, limit, offset } = options;
+      const { filters = {}, orderBy = 'id', ascending = false, limit, offset } = options;
 
       let query = this.db.getClient().from(this.tableName).select('*');
 
