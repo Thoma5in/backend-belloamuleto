@@ -1,0 +1,150 @@
+// ===========================================================================
+// ARCHIVO DE PRUEBA PARA TESTEAR LA API
+// ===========================================================================
+// Puedes usar este archivo con herramientas como:
+// - REST Client (extensión de VS Code)
+// - Postman (importar como colección)
+// - cURL (copiar los comandos)
+// ===========================================================================
+
+### Variables
+@baseUrl = http://localhost:3000
+@apiUrl = {{baseUrl}}/api
+
+### ========== HEALTH CHECK ==========
+
+### 1. Root endpoint
+GET {{baseUrl}}/
+
+### 2. Health check
+GET {{apiUrl}}/health
+
+### ========== PRODUCTOS - LECTURA ==========
+
+### 3. Obtener todos los productos (sin filtros)
+GET {{apiUrl}}/products
+
+### 4. Obtener productos con paginación
+GET {{apiUrl}}/products?page=1&limit=5
+
+### 5. Obtener productos con filtros
+GET {{apiUrl}}/products?category=electronics&minPrice=100&maxPrice=500&sortBy=price&sortOrder=asc
+
+### 6. Obtener producto por ID (reemplaza con un UUID real de tu BD)
+GET {{apiUrl}}/products/123e4567-e89b-12d3-a456-426614174000
+
+### 7. Buscar productos por nombre
+GET {{apiUrl}}/products/search?q=laptop
+
+### 8. Obtener productos por categoría
+GET {{apiUrl}}/products/category/electronics
+
+### 9. Obtener productos con stock bajo
+GET {{apiUrl}}/products/low-stock
+
+### ========== PRODUCTOS - ESCRITURA ==========
+
+### 10. Crear nuevo producto
+POST {{apiUrl}}/products
+Content-Type: application/json
+
+{
+  "name": "MacBook Pro 16",
+  "description": "Laptop profesional para desarrollo",
+  "price": 2499.99,
+  "stock": 10,
+  "category": "electronics",
+  "is_active": true
+}
+
+### 11. Actualizar producto completo (reemplaza ID)
+PUT {{apiUrl}}/products/123e4567-e89b-12d3-a456-426614174000
+Content-Type: application/json
+
+{
+  "name": "MacBook Pro 16 M2",
+  "description": "Laptop profesional con chip M2",
+  "price": 2699.99,
+  "stock": 15,
+  "category": "electronics",
+  "is_active": true
+}
+
+### 12. Actualizar solo el stock (agregar 10 unidades)
+PATCH {{apiUrl}}/products/123e4567-e89b-12d3-a456-426614174000/stock
+Content-Type: application/json
+
+{
+  "quantity": 10
+}
+
+### 13. Actualizar solo el stock (restar 5 unidades)
+PATCH {{apiUrl}}/products/123e4567-e89b-12d3-a456-426614174000/stock
+Content-Type: application/json
+
+{
+  "quantity": -5
+}
+
+### 14. Eliminar producto (soft delete)
+DELETE {{apiUrl}}/products/123e4567-e89b-12d3-a456-426614174000
+
+### ========== CASOS DE ERROR ==========
+
+### 15. Crear producto sin campos requeridos (debe fallar)
+POST {{apiUrl}}/products
+Content-Type: application/json
+
+{
+  "description": "Producto sin nombre"
+}
+
+### 16. Crear producto con precio negativo (debe fallar)
+POST {{apiUrl}}/products
+Content-Type: application/json
+
+{
+  "name": "Producto Inválido",
+  "price": -100,
+  "stock": 10
+}
+
+### 17. Obtener producto con ID inválido (debe fallar)
+GET {{apiUrl}}/products/invalid-id
+
+### 18. Buscar sin término de búsqueda (debe fallar)
+GET {{apiUrl}}/products/search
+
+### 19. Actualizar stock con cantidad no numérica (debe fallar)
+PATCH {{apiUrl}}/products/123e4567-e89b-12d3-a456-426614174000/stock
+Content-Type: application/json
+
+{
+  "quantity": "diez"
+}
+
+### 20. Ruta no existente (404)
+GET {{apiUrl}}/productos/inexistente
+
+### ========== NOTAS ==========
+# 
+# 1. Reemplaza los UUIDs de ejemplo con IDs reales de tu base de datos
+# 2. Verifica que el servidor esté corriendo en el puerto correcto
+# 3. Las respuestas con error mostrarán detalles en desarrollo
+# 4. En producción, los errores mostrarán mensajes genéricos
+# 
+# Estructura de respuestas exitosas:
+# {
+#   "success": true,
+#   "data": { ... },
+#   "pagination": { ... } // solo en listados
+# }
+#
+# Estructura de respuestas con error:
+# {
+#   "success": false,
+#   "error": {
+#     "message": "...",
+#     "statusCode": 400
+#   }
+# }

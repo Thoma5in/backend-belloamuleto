@@ -1,0 +1,271 @@
+================================================================================
+✅ BACKEND BELLO AMULETO - ESTRUCTURA COMPLETA
+================================================================================
+
+📦 backend-belloamuleto/
+│
+├── 📄 package.json                    # Dependencias del proyecto
+├── 📄 .env.example                    # Template de variables de entorno
+├── 📄 .gitignore                      # Archivos ignorados por Git
+│
+├── 📚 DOCUMENTACIÓN
+│   ├── 📄 README.md                   # Inicio rápido y resumen
+│   ├── 📄 ARCHITECTURE.md             # Arquitectura completa y detallada
+│   ├── 📄 QUICK_GUIDE.md              # Guía para agregar features
+│   ├── 📄 DECISIONS.md                # Decisiones arquitectónicas
+│   ├── 📄 EXAMPLES.md                 # Ejemplos de uso de la API
+│   ├── 📄 database-setup.sql          # Script SQL para crear tablas
+│   └── 📄 api-tests.http              # Tests HTTP (REST Client)
+│
+└── 📁 src/
+    │
+    ├── 📄 server.js                   # Punto de entrada (inicio del servidor)
+    ├── 📄 app.js                      # Configuración de Express
+    │
+    ├── 📁 config/                     # CAPA DE INFRAESTRUCTURA
+    │   ├── database.js                # ✨ Abstracción del cliente BD (singleton)
+    │   ├── supabase.js                # Cliente de Supabase
+    │   └── jwt.js                     # Configuración JWT
+    │
+    ├── 📁 repositories/               # CAPA DE ACCESO A DATOS
+    │   ├── BaseRepository.js          # ✨ Repository base con CRUD genérico
+    │   └── ProductRepository.js       # Repository de productos (ejemplo)
+    │
+    ├── 📁 services/                   # CAPA DE LÓGICA DE NEGOCIO
+    │   └── ProductService.js          # ✨ Servicio de productos con validaciones
+    │
+    ├── 📁 controllers/                # CAPA DE PRESENTACIÓN (HTTP)
+    │   └── ProductController.js       # Controlador HTTP de productos
+    │
+    ├── 📁 routes/                     # DEFINICIÓN DE RUTAS
+    │   ├── index.js                   # Router principal
+    │   └── productRoutes.js           # Rutas de productos
+    │
+    ├── 📁 middlewares/                # MIDDLEWARES DE EXPRESS
+    │   ├── errorHandler.js            # ✨ Manejo centralizado de errores
+    │   └── logger.js                  # Logger de peticiones HTTP
+    │
+    └── 📁 utils/                      # UTILIDADES
+        └── errors.js                  # ✨ Clases de errores personalizados
+
+================================================================================
+🏗️ FLUJO DE UNA PETICIÓN (Ejemplo: GET /api/products/123)
+================================================================================
+
+1️⃣  HTTP Request
+    ↓
+2️⃣  ROUTES (productRoutes.js)
+    └─ router.get('/:id', productController.getProductById)
+    ↓
+3️⃣  CONTROLLER (ProductController.js)
+    ├─ Extrae parámetros: const { id } = req.params
+    ├─ Llama al service ────────────────────────────────────┐
+    └─ Formatea respuesta HTTP                              ↓
+    ↑                                                        ↓
+    │                                                4️⃣  SERVICE (ProductService.js)
+    │                                                    ├─ Valida ID (regla de negocio)
+    │                                                    ├─ Llama al repository ──────┐
+    │                                                    ├─ Enriquece datos            ↓
+    │                                                    └─ Retorna datos procesados   ↓
+    │                                                    ↑                             ↓
+    │                                                    │                     5️⃣  REPOSITORY (ProductRepository.js)
+    └────────────────────────────────────────────────────┤                         ├─ Construye query
+                                                         │                         ├─ Ejecuta en Supabase ──┐
+                                                         │                         └─ Retorna datos raw     ↓
+                                                         │                         ↑                        ↓
+                                                         │                         │                6️⃣  CONFIG (database.js)
+                                                         │                         │                    └─ Cliente Supabase
+                                                         │                         │                    ↑
+                                                         └─────────────────────────┘                    │
+                                                                                                       7️⃣  SUPABASE
+                                                                                                           └─ PostgreSQL
+8️⃣  HTTP Response
+    └─ { success: true, data: { ...producto... } }
+
+================================================================================
+📋 RESPONSABILIDADES POR CAPA
+================================================================================
+
+╔════════════════╦══════════════════════════════╦═══════════════════════════╗
+║ CAPA           ║ ✅ SÍ DEBE HACER              ║ ❌ NO DEBE HACER          ║
+╠════════════════╬══════════════════════════════╬═══════════════════════════╣
+║ Controllers    ║ • Extraer params/body/query  ║ • Lógica de negocio       ║
+║                ║ • Validar formato HTTP       ║ • Acceso directo a BD     ║
+║                ║ • Llamar a services          ║ • Cálculos complejos      ║
+║                ║ • Formatear respuestas HTTP  ║                           ║
+╠════════════════╬══════════════════════════════╬═══════════════════════════╣
+║ Services       ║ • Lógica de negocio          ║ • Conocer HTTP            ║
+║                ║ • Validaciones de reglas     ║ • Acceso directo a BD     ║
+║                ║ • Orquestar repositories     ║ • Usar req/res            ║
+║                ║ • Transformar/enriquecer     ║                           ║
+╠════════════════╬══════════════════════════════╬═══════════════════════════╣
+║ Repositories   ║ • CRUD operations            ║ • Lógica de negocio       ║
+║                ║ • Queries a BD               ║ • Validaciones de negocio ║
+║                ║ • Mapeo de datos             ║ • Conocer HTTP            ║
+║                ║ • Manejo de errores de BD    ║                           ║
+╠════════════════╬══════════════════════════════╬═══════════════════════════╣
+║ Config         ║ • Inicializar conexiones     ║ • Lógica de negocio       ║
+║                ║ • Variables de entorno       ║ • Operaciones de datos    ║
+║                ║ • Clientes singleton         ║                           ║
+╚════════════════╩══════════════════════════════╩═══════════════════════════╝
+
+================================================================================
+🎯 ARCHIVOS CLAVE Y SU PROPÓSITO
+================================================================================
+
+✨ BaseRepository.js
+   └─ Implementa CRUD genérico (findAll, findById, create, update, delete)
+   └─ Todos los repositories heredan de esta clase
+   └─ DECISIÓN: Evita duplicar código CRUD en cada entidad
+
+✨ database.js
+   └─ Abstrae el cliente de Supabase
+   └─ DECISIÓN: Cambiar de BD solo requiere modificar este archivo
+
+✨ ProductService.js
+   └─ Contiene TODA la lógica de negocio
+   └─ Ejemplos: validaciones, cálculos, reglas del dominio
+   └─ DECISIÓN: Independiente de HTTP y de la BD
+
+✨ errorHandler.js
+   └─ Middleware que captura todos los errores
+   └─ Formatea respuestas consistentes
+   └─ DECISIÓN: Un solo lugar para manejar errores
+
+✨ errors.js
+   └─ Clases de errores tipados (NotFoundError, ValidationError, etc.)
+   └─ DECISIÓN: Facilita identificar y manejar diferentes tipos de errores
+
+================================================================================
+📡 ENDPOINTS IMPLEMENTADOS
+================================================================================
+
+GET    /                                    → Info de la API
+GET    /api/health                          → Health check
+
+GET    /api/products                        → Listar productos (paginación/filtros)
+GET    /api/products/:id                    → Obtener producto por ID
+GET    /api/products/search?q=término       → Buscar productos
+GET    /api/products/category/:category     → Productos por categoría
+GET    /api/products/low-stock              → Productos con stock bajo
+POST   /api/products                        → Crear producto
+PUT    /api/products/:id                    → Actualizar producto
+PATCH  /api/products/:id/stock              → Actualizar solo stock
+DELETE /api/products/:id                    → Eliminar producto (soft delete)
+
+================================================================================
+🛠️ TECNOLOGÍAS Y DEPENDENCIAS
+================================================================================
+
+├─ express              → Framework web
+├─ @supabase/supabase-js → SDK de Supabase
+├─ dotenv               → Variables de entorno
+└─ nodemon              → Auto-reload en desarrollo (devDependency)
+
+================================================================================
+⚙️ COMANDOS DISPONIBLES
+================================================================================
+
+npm install             # Instalar dependencias
+npm run dev             # Desarrollo con auto-reload
+npm start               # Producción
+
+================================================================================
+🔐 VARIABLES DE ENTORNO REQUERIDAS
+================================================================================
+
+SUPABASE_URL                → URL de tu proyecto Supabase
+SUPABASE_SERVICE_ROLE_KEY   → Service role key de Supabase
+PORT                        → Puerto del servidor (default: 3000)
+NODE_ENV                    → Entorno: development | production
+
+================================================================================
+✨ CARACTERÍSTICAS DESTACADAS
+================================================================================
+
+✅ Arquitectura en capas (4 capas bien definidas)
+✅ Desacoplamiento total de Supabase (fácil cambiar BD)
+✅ BaseRepository reutilizable para todas las entidades
+✅ Manejo de errores centralizado y robusto
+✅ Soft delete (no se pierden datos)
+✅ Validaciones en múltiples capas
+✅ Dependency Injection (testing fácil)
+✅ Singleton patterns correctamente implementados
+✅ Async/await en todas las capas
+✅ Documentación exhaustiva
+✅ Ejemplos de uso completos
+✅ SQL scripts incluidos
+
+================================================================================
+📖 DOCUMENTACIÓN RECOMENDADA SEGÚN TU NECESIDAD
+================================================================================
+
+🆕 Nuevo en el proyecto?
+   └─ Lee: README.md → ARCHITECTURE.md
+
+💻 Agregar funcionalidades?
+   └─ Lee: QUICK_GUIDE.md
+
+🤔 Entender decisiones técnicas?
+   └─ Lee: DECISIONS.md
+
+🧪 Testear la API?
+   └─ Usa: api-tests.http (con REST Client de VS Code)
+
+🗄️ Configurar base de datos?
+   └─ Ejecuta: database-setup.sql en Supabase
+
+📡 Consumir desde frontend?
+   └─ Lee: EXAMPLES.md
+
+================================================================================
+🚀 INICIO RÁPIDO (3 PASOS)
+================================================================================
+
+1. Configurar ambiente:
+   cp .env.example .env
+   # Editar .env con credenciales de Supabase
+
+2. Crear tabla en Supabase:
+   # Ejecutar database-setup.sql en SQL Editor
+
+3. Iniciar servidor:
+   npm install
+   npm run dev
+
+¡Listo! API corriendo en http://localhost:3000
+
+================================================================================
+🎓 PRINCIPIOS APLICADOS
+================================================================================
+
+✓ SOLID (especialmente Single Responsibility)
+✓ DRY (Don't Repeat Yourself)
+✓ KISS (Keep It Simple, Stupid)
+✓ Separation of Concerns
+✓ Dependency Injection
+✓ Clean Architecture
+
+================================================================================
+🔮 EVOLUCIÓN FUTURA SUGERIDA
+================================================================================
+
+1. ✅ Migrar a TypeScript
+2. ✅ Agregar testing (Jest)
+3. ✅ Implementar autenticación JWT
+4. ✅ Agregar validación de schemas (Zod/Joi)
+5. ✅ Documentar con OpenAPI/Swagger
+6. ✅ Rate limiting
+7. ✅ Logging avanzado (Winston/Pino)
+8. ✅ Cache con Redis
+9. ✅ CI/CD
+10. ✅ Monitoring y alertas
+
+================================================================================
+✅ PROYECTO COMPLETADO Y LISTO PARA USAR
+================================================================================
+
+Todo está implementado y documentado. Puedes empezar a desarrollar
+manteniendo la arquitectura limpia y escalable.
+
+¡Feliz codificación! 🚀
