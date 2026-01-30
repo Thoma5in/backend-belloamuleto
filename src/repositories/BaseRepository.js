@@ -20,11 +20,20 @@ import database from '../config/database.js';
 import { DatabaseError, NotFoundError } from '../utils/errors.js';
 
 export class BaseRepository {
-  constructor(tableName) {
+  constructor(tableName, options = {}) {
     if (!tableName) {
       throw new Error('Table name is required for repository');
     }
+
+    // Backwards-compatible options parsing:
+    // - old signature: new BaseRepository('table')
+    // - new signature: new BaseRepository('table', { idColumn: 'id_categoria' })
+    // - allow passing string as idColumn: new BaseRepository('table', 'id')
+    const normalizedOptions =
+      typeof options === 'string' ? { idColumn: options } : (options || {});
+
     this.tableName = tableName;
+    this.idColumn = normalizedOptions.idColumn || 'id';
     this.db = database;
   }
 
@@ -40,7 +49,7 @@ export class BaseRepository {
    */
   async findAll(options = {}) {
     try {
-      const { filters = {}, orderBy = 'id', ascending = false, limit, offset } = options;
+      const { filters = {}, orderBy = this.idColumn, ascending = false, limit, offset } = options;
 
       let query = this.db.getClient().from(this.tableName).select('*');
 
@@ -88,7 +97,7 @@ export class BaseRepository {
         .getClient()
         .from(this.tableName)
         .select('*')
-        .eq('id', id)
+        .eq(this.idColumn, id)
         .single();
 
       if (error) {
@@ -171,7 +180,7 @@ export class BaseRepository {
         .getClient()
         .from(this.tableName)
         .update(data)
-        .eq('id', id)
+        .eq(this.idColumn, id)
         .select()
         .single();
 
@@ -201,7 +210,7 @@ export class BaseRepository {
         .getClient()
         .from(this.tableName)
         .update({ deleted_at: new Date().toISOString() })
-        .eq('id', id)
+        .eq(this.idColumn, id)
         .select()
         .single();
 
@@ -211,7 +220,7 @@ export class BaseRepository {
           .getClient()
           .from(this.tableName)
           .delete()
-          .eq('id', id);
+          .eq(this.idColumn, id);
 
         if (deleteError) {
           throw new DatabaseError(`Error deleting ${this.tableName}: ${deleteError.message}`);

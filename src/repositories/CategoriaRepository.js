@@ -13,7 +13,7 @@ import { DatabaseError } from '../utils/errors.js';
 
 export class CategoriaRepository extends BaseRepository {
   constructor() {
-    super('categorias_producto');
+    super('categorias_producto', { idColumn: 'id_categoria' });
   }
 
   /**

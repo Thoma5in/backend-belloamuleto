@@ -7,16 +7,19 @@
 
 import { Router } from 'express';
 import productRoutes from './productRoutes.js';
+import categoryRoutes from './categoryRoutes.js';
 
 const router = Router();
 
 // Rutas de productos
 router.use('/products', productRoutes);
 
+// Rutas de categorías
+router.use('/categories', categoryRoutes);
+
 // Aquí puedes agregar más recursos:
 // router.use('/users', userRoutes);
 // router.use('/orders', orderRoutes);
-// router.use('/categories', categoryRoutes);
 
 // Ruta de health check
 router.get('/health', (req, res) => {
