@@ -9,12 +9,14 @@
  * - id (bigint, primary key)
  * - usuario_id (bigint, FK a usuarios)
  * - fecha_creacion (timestamp with time zone, default now())
+ * - estado (smallint, default 1) -- 1: activo, 2: convertido a pedido, 3: abandonado
  * 
  * detalles_carritos:
  * - id (bigint, primary key)
  * - carrito_id (bigint, FK a carritos)
  * - producto_id (bigint, FK a productos)
  * - cantidad (integer)
+ * - UNIQUE CONSTRAINT (carrito_id, producto_id) -- evita duplicados
  */
 
 import { BaseRepository } from './BaseRepository.js';
@@ -39,26 +41,44 @@ export class CarritoRepository extends BaseRepository {
   }
 
   /**
-   * Obtiene o crea un carrito para un usuario
+   * Obtiene o crea un carrito activo para un usuario
    * @param {number} usuarioId - ID del usuario
    * @returns {Promise<Object>}
    */
   async getOrCreateCarrito(usuarioId) {
     try {
-      let carrito = await this.findByUsuario(usuarioId);
+      // Buscar carrito activo (estado = 1)
+      const { data, error } = await this.db
+        .getClient()
+        .from(this.tableName)
+        .select('*')
+        .eq('usuario_id', usuarioId)
+        .eq('estado', 1)
+        .single();
       
-      if (!carrito) {
-        carrito = await this.create({ usuario_id: usuarioId });
+      if (error && error.code !== 'PGRST116') {
+        throw new DatabaseError(`Error finding active cart: ${error.message}`);
       }
+
+      if (data) {
+        return data;
+      }
+
+      // Crear nuevo carrito activo
+      const carrito = await this.create({ 
+        usuario_id: usuarioId,
+        estado: 1 
+      });
 
       return carrito;
     } catch (error) {
-      throw error;
+      if (error instanceof DatabaseError) throw error;
+      throw new DatabaseError(`Unexpected error in getOrCreateCarrito: ${error.message}`);
     }
   }
 
   /**
-   * Obtiene un carrito con todos sus detalles y productos
+   * Obtiene un carrito activo con todos sus detalles y productos
    * @param {number} usuarioId - ID del usuario
    * @returns {Promise<Object|null>}
    */
@@ -71,6 +91,7 @@ export class CarritoRepository extends BaseRepository {
           id,
           usuario_id,
           fecha_creacion,
+          estado,
           detalles_carritos (
             id,
             cantidad,
@@ -85,6 +106,7 @@ export class CarritoRepository extends BaseRepository {
           )
         `)
         .eq('usuario_id', usuarioId)
+        .eq('estado', 1)
         .single();
 
       if (error) {
@@ -102,7 +124,8 @@ export class CarritoRepository extends BaseRepository {
   }
 
   /**
-   * Agrega un producto al carrito
+   * Agrega un producto al carrito (o incrementa cantidad si ya existe)
+   * Usa UPSERT aprovechando la UNIQUE constraint (carrito_id, producto_id)
    * @param {number} carritoId - ID del carrito
    * @param {number} productoId - ID del producto
    * @param {number} cantidad - Cantidad a agregar
@@ -110,17 +133,17 @@ export class CarritoRepository extends BaseRepository {
    */
   async agregarProducto(carritoId, productoId, cantidad) {
     try {
-      // Verificar si el producto ya está en el carrito
-      const { data: existing, error: findError } = await this.db
+      // Primero intentar obtener el detalle existente
+      const { data: existing } = await this.db
         .getClient()
         .from('detalles_carritos')
         .select('*')
         .eq('carrito_id', carritoId)
         .eq('producto_id', productoId)
-        .single();
+        .maybeSingle();
 
       if (existing) {
-        // Actualizar cantidad si ya existe
+        // Si existe, incrementar la cantidad
         const { data, error } = await this.db
           .getClient()
           .from('detalles_carritos')
@@ -132,7 +155,7 @@ export class CarritoRepository extends BaseRepository {
         if (error) throw new DatabaseError(`Error updating cart item: ${error.message}`);
         return data;
       } else {
-        // Crear nuevo detalle
+        // Si no existe, insertar nuevo
         const { data, error } = await this.db
           .getClient()
           .from('detalles_carritos')
@@ -217,6 +240,35 @@ export class CarritoRepository extends BaseRepository {
 
       if (error) throw new DatabaseError(`Error clearing cart: ${error.message}`);
       return true;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  /**
+   * Cambia el estado del carrito
+   * @param {number} carritoId - ID del carrito
+   * @param {number} nuevoEstado - Nuevo estado (1: activo, 2: convertido a pedido, 3: abandonado)
+   * @returns {Promise<Object>}
+   */
+  async cambiarEstado(carritoId, nuevoEstado) {
+    try {
+      const { data, error } = await this.db
+        .getClient()
+        .from(this.tableName)
+        .update({ estado: nuevoEstado })
+        .eq('id', carritoId)
+        .select()
+        .single();
+
+      if (error) {
+        if (error.code === 'PGRST116') {
+          throw new NotFoundError('Carrito no encontrado');
+        }
+        throw new DatabaseError(`Error changing cart state: ${error.message}`);
+      }
+
+      return data;
     } catch (error) {
       throw error;
     }
