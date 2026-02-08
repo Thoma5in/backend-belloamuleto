@@ -8,6 +8,7 @@
 import { Router } from 'express';
 import productRoutes from './productRoutes.js';
 import categoryRoutes from './categoryRoutes.js';
+import carritoRoutes from './carritoRoutes.js';
 
 const router = Router();
 
@@ -16,6 +17,9 @@ router.use('/products', productRoutes);
 
 // Rutas de categorías
 router.use('/categories', categoryRoutes);
+
+// Rutas de carrito de compras
+router.use('/carrito', carritoRoutes);
 
 // Aquí puedes agregar más recursos:
 // router.use('/users', userRoutes);

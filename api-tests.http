@@ -126,6 +126,51 @@ Content-Type: application/json
 ### 20. Ruta no existente (404)
 GET {{apiUrl}}/productos/inexistente
 
+### ========== CARRITO ==========
+
+### 21. Obtener carrito del usuario (envía usuario_id en body)
+GET {{apiUrl}}/carrito
+Content-Type: application/json
+
+{
+  "usuario_id": 1
+}
+
+### 22. Agregar producto al carrito
+POST {{apiUrl}}/carrito/items
+Content-Type: application/json
+
+{
+  "usuario_id": 1,
+  "producto_id": 1,
+  "cantidad": 2
+}
+
+### 23. Actualizar cantidad de un producto en el carrito
+PUT {{apiUrl}}/carrito/items/1
+Content-Type: application/json
+
+{
+  "usuario_id": 1,
+  "cantidad": 3
+}
+
+### 24. Eliminar un producto del carrito
+DELETE {{apiUrl}}/carrito/items/1
+Content-Type: application/json
+
+{
+  "usuario_id": 1
+}
+
+### 25. Vaciar el carrito por completo
+DELETE {{apiUrl}}/carrito
+Content-Type: application/json
+
+{
+  "usuario_id": 1
+}
+
 ### ========== NOTAS ==========
 # 
 # 1. Reemplaza los UUIDs de ejemplo con IDs reales de tu base de datos
