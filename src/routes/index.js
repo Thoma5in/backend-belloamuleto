@@ -9,6 +9,7 @@ import { Router } from 'express';
 import productRoutes from './productRoutes.js';
 import categoryRoutes from './categoryRoutes.js';
 import carritoRoutes from './carritoRoutes.js';
+import authRoutes from './authRoutes.js';
 
 const router = Router();
 
@@ -20,6 +21,9 @@ router.use('/categories', categoryRoutes);
 
 // Rutas de carrito de compras
 router.use('/carrito', carritoRoutes);
+
+// Rutas de autenticacion
+router.use('/auth', authRoutes);
 
 // Aquí puedes agregar más recursos:
 // router.use('/users', userRoutes);
