@@ -19,6 +19,20 @@ GET {{baseUrl}}/
 ### 2. Health check
 GET {{apiUrl}}/health
 
+### ========== AUTH ==========
+
+### 2.1 Registro de usuario
+POST {{apiUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "email": "nuevo.usuario@ejemplo.com",
+  "password": "Password123",
+  "nombre": "Nuevo Usuario",
+  "direccion": "Av. Principal 123",
+  "telefono": "+51 999 999 999"
+}
+
 ### ========== PRODUCTOS - LECTURA ==========
 
 ### 3. Obtener todos los productos (sin filtros)
