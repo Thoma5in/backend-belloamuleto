@@ -146,15 +146,27 @@ create table public.roles (
   constraint roles_nombre_key unique (nombre)
 ) TABLESPACE pg_default;
 
-create table public.usuarios_roles (
-  id uuid not null default gen_random_uuid (),
+create table public.empleados (
   usuario_id uuid not null,
+  numero_empleado text null,
+  fecha_contratacion date null,
+  departamento text null,
+  activo boolean not null default true,
+  creado_en timestamp with time zone not null default now(),
+  constraint empleados_pkey primary key (usuario_id),
+  constraint empleados_numero_empleado_key unique (numero_empleado),
+  constraint empleados_usuario_id_fkey foreign KEY (usuario_id) references auth.users (id) on delete CASCADE
+) TABLESPACE pg_default;
+
+create table public.empleados_roles (
+  id uuid not null default gen_random_uuid (),
+  empleado_id uuid not null,
   rol_id uuid not null,
   otorgado_por uuid null,
   otorgado_en timestamp with time zone not null default now(),
-  constraint usuarios_roles_pkey primary key (id),
-  constraint usuarios_roles_unico unique (usuario_id, rol_id),
-  constraint usuarios_roles_otorgado_por_fkey foreign KEY (otorgado_por) references auth.users (id),
-  constraint usuarios_roles_rol_id_fkey foreign KEY (rol_id) references roles (id) on delete CASCADE,
-  constraint usuarios_roles_usuario_id_fkey foreign KEY (usuario_id) references auth.users (id) on delete CASCADE
+  constraint empleados_roles_pkey primary key (id),
+  constraint empleados_roles_unico unique (empleado_id, rol_id),
+  constraint empleados_roles_empleado_id_fkey foreign KEY (empleado_id) references empleados (usuario_id) on delete CASCADE,
+  constraint empleados_roles_otorgado_por_fkey foreign KEY (otorgado_por) references auth.users (id),
+  constraint empleados_roles_rol_id_fkey foreign KEY (rol_id) references roles (id) on delete CASCADE
 ) TABLESPACE pg_default;
