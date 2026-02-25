@@ -136,3 +136,25 @@ CREATE TABLE public.usuarios (
   CONSTRAINT usuarios_pkey PRIMARY KEY (id),
   CONSTRAINT fk_usuarios_auth_user_id FOREIGN KEY (auth_user_id) REFERENCES auth.users(id)
 );
+
+create table public.roles (
+  id uuid not null default gen_random_uuid (),
+  nombre text not null,
+  descripcion text null,
+  creado_en timestamp with time zone not null default now(),
+  constraint roles_pkey primary key (id),
+  constraint roles_nombre_key unique (nombre)
+) TABLESPACE pg_default;
+
+create table public.usuarios_roles (
+  id uuid not null default gen_random_uuid (),
+  usuario_id uuid not null,
+  rol_id uuid not null,
+  otorgado_por uuid null,
+  otorgado_en timestamp with time zone not null default now(),
+  constraint usuarios_roles_pkey primary key (id),
+  constraint usuarios_roles_unico unique (usuario_id, rol_id),
+  constraint usuarios_roles_otorgado_por_fkey foreign KEY (otorgado_por) references auth.users (id),
+  constraint usuarios_roles_rol_id_fkey foreign KEY (rol_id) references roles (id) on delete CASCADE,
+  constraint usuarios_roles_usuario_id_fkey foreign KEY (usuario_id) references auth.users (id) on delete CASCADE
+) TABLESPACE pg_default;
