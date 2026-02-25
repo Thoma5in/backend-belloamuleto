@@ -10,6 +10,9 @@ import productRoutes from './productRoutes.js';
 import categoryRoutes from './categoryRoutes.js';
 import carritoRoutes from './carritoRoutes.js';
 import authRoutes from './authRoutes.js';
+import rolesRoutes from './rolesRoutes.js';
+import empleadosRoutes from './empleadosRoutes.js';
+import empleadosRolesRoutes from './empleadosRolesRoutes.js';
 
 const router = Router();
 
@@ -24,6 +27,15 @@ router.use('/carrito', carritoRoutes);
 
 // Rutas de autenticacion
 router.use('/auth', authRoutes);
+
+// Rutas de roles
+router.use('/roles', rolesRoutes);
+
+// Rutas de empleados
+router.use('/empleados', empleadosRoutes);
+
+// Rutas de asignación empleados-roles (sin prefijo por estructura anidada)
+router.use('/', empleadosRolesRoutes);
 
 // Aquí puedes agregar más recursos:
 // router.use('/users', userRoutes);

@@ -185,6 +185,131 @@ Content-Type: application/json
   "usuario_id": 1
 }
 
+### ========== ROLES ==========
+
+### 26. Obtener todos los roles
+GET {{apiUrl}}/roles
+
+### 27. Obtener rol por ID
+GET {{apiUrl}}/roles/550e8400-e29b-41d4-a716-446655440000
+
+### 28. Crear nuevo rol
+POST {{apiUrl}}/roles
+Content-Type: application/json
+
+{
+  "nombre": "Gerente",
+  "descripcion": "Rol de gerente con permisos administrativos"
+}
+
+### 29. Actualizar rol
+PUT {{apiUrl}}/roles/550e8400-e29b-41d4-a716-446655440000
+Content-Type: application/json
+
+{
+  "nombre": "Gerente Senior",
+  "descripcion": "Gerente con permisos avanzados"
+}
+
+### 30. Eliminar rol
+DELETE {{apiUrl}}/roles/550e8400-e29b-41d4-a716-446655440000
+
+### ========== EMPLEADOS ==========
+
+### 31. Obtener todos los empleados
+GET {{apiUrl}}/empleados
+
+### 32. Obtener solo empleados activos
+GET {{apiUrl}}/empleados?activos=true
+
+### 33. Obtener empleados con roles anidados
+GET {{apiUrl}}/empleados/with-roles
+
+### 34. Obtener empleado por ID (usuario_id)
+GET {{apiUrl}}/empleados/550e8400-e29b-41d4-a716-446655440001
+
+### 35. Obtener empleado con sus roles
+GET {{apiUrl}}/empleados/550e8400-e29b-41d4-a716-446655440001/with-roles
+
+### 36. Crear nuevo empleado
+POST {{apiUrl}}/empleados
+Content-Type: application/json
+
+{
+  "usuario_id": "550e8400-e29b-41d4-a716-446655440002",
+  "numero_empleado": "EMP-2026-001",
+  "fecha_contratacion": "2026-02-25",
+  "departamento": "Desarrollo",
+  "activo": true
+}
+
+### 37. Actualizar empleado
+PUT {{apiUrl}}/empleados/550e8400-e29b-41d4-a716-446655440002
+Content-Type: application/json
+
+{
+  "numero_empleado": "EMP-2026-001",
+  "departamento": "Desarrollo Backend",
+  "activo": true
+}
+
+### 38. Eliminar empleado
+DELETE {{apiUrl}}/empleados/550e8400-e29b-41d4-a716-446655440002
+
+### ========== EMPLEADOS-ROLES ==========
+
+### 39. Obtener todas las asignaciones rol-empleado
+GET {{apiUrl}}/empleados-roles
+
+### 40. Obtener roles de un empleado
+GET {{apiUrl}}/empleados/550e8400-e29b-41d4-a716-446655440001/roles
+
+### 41. Asignar un rol a un empleado
+POST {{apiUrl}}/empleados/550e8400-e29b-41d4-a716-446655440001/roles
+Content-Type: application/json
+
+{
+  "rol_id": "550e8400-e29b-41d4-a716-446655440000",
+  "otorgado_por": "550e8400-e29b-41d4-a716-446655440003"
+}
+
+### 42. Asignar múltiples roles a un empleado
+POST {{apiUrl}}/empleados/550e8400-e29b-41d4-a716-446655440001/roles
+Content-Type: application/json
+
+{
+  "roles_ids": [
+    "550e8400-e29b-41d4-a716-446655440000",
+    "550e8400-e29b-41d4-a716-446655440010"
+  ],
+  "otorgado_por": "550e8400-e29b-41d4-a716-446655440003"
+}
+
+### 43. Asignar múltiples roles (endpoint explícito)
+POST {{apiUrl}}/empleados/550e8400-e29b-41d4-a716-446655440001/roles/bulk
+Content-Type: application/json
+
+{
+  "roles_ids": [
+    "550e8400-e29b-41d4-a716-446655440000",
+    "550e8400-e29b-41d4-a716-446655440010",
+    "550e8400-e29b-41d4-a716-446655440020"
+  ],
+  "otorgado_por": "550e8400-e29b-41d4-a716-446655440003"
+}
+
+### 44. Verificar si un empleado tiene un rol
+GET {{apiUrl}}/empleados/550e8400-e29b-41d4-a716-446655440001/roles/550e8400-e29b-41d4-a716-446655440000/verificar
+
+### 45. Revocar rol específico de un empleado
+DELETE {{apiUrl}}/empleados/550e8400-e29b-41d4-a716-446655440001/roles/550e8400-e29b-41d4-a716-446655440000
+
+### 46. Revocar todos los roles de un empleado
+DELETE {{apiUrl}}/empleados/550e8400-e29b-41d4-a716-446655440001/roles
+
+### 47. Obtener todos los empleados con un rol específico
+GET {{apiUrl}}/roles/550e8400-e29b-41d4-a716-446655440000/empleados
+
 ### ========== NOTAS ==========
 # 
 # 1. Reemplaza los UUIDs de ejemplo con IDs reales de tu base de datos
@@ -207,3 +332,10 @@ Content-Type: application/json
 #     "statusCode": 400
 #   }
 # }
+#
+# ENDPOINTS AGREGADOS:
+# - Roles: 5 endpoints (GET all, GET by ID, POST create, PUT update, DELETE)
+# - Empleados: 7 endpoints (GET all con filtro, GET by ID, POST create, PUT update, DELETE, GET with roles, GET all with roles)
+# - EmpleadosRoles: 8 endpoints (GET all asignaciones, GET roles de empleado, POST asignar, DELETE revocar, etc)
+#
+# Total: 20 endpoints para gestionar roles, empleados y sus relaciones
